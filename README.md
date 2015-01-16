@@ -1,4 +1,4 @@
-# no-frills-http
+# no-frills-request
 
 A super low-level, light-weight wrapper for sending and receiving HTTP requests. 
 
@@ -6,7 +6,7 @@ This module abstracts the http/https modules and not a whole lot more.
 
 ## Installation
 
-	$ npm install --save no-frills-http
+	$ npm install --save no-frills-request
 	
 ## Example
 	
