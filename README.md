@@ -21,9 +21,9 @@ This module abstracts the http/https modules and not a whole lot more.
 	
 	  if (res.headers['content-type'].split(';')[0] === 'text/html') {
 	  
-	  res.on('data', function() {
-        console.log(res.url+' saved to '+fname);
-      });
+		  res.on('data', function() {
+			console.log(res.url+' saved to '+fname);
+		  });
 	  
 	  } else {
 	  
