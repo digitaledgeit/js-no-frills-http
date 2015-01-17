@@ -8,7 +8,7 @@ This module abstracts the HTTP/HTTPS modules and not a whole lot more.
 
 	$ npm install --save no-frills-request
 	
-## Example
+## Usage
 
 ### Concatenate a text URL to string
 	
@@ -51,6 +51,29 @@ This module abstracts the HTTP/HTTPS modules and not a whole lot more.
 	
 	});
 	
+## API
+
+### request(method, url, [options], callback);
+
+Options:
+
+	@param {String}          method
+	@param {String}          url
+	@param {Object}          [options]
+	@param {Object}          [options.headers]
+	@param {String|Stream}   [options.body]
+	@param {String}          [options.agent.https_protocol]
+	@param {Boolean}         [options.agent.https_ignore_errors]
+	@param {Function}        callback
+
+### request.get(url, [options], callback)
+
+### request.post(url, [options], callback)
+
+### request.put(url, [options], callback)
+
+### request.delete(url, [options], callback)
+		
 ## License
 
 The MIT License (MIT)

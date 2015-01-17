@@ -8,8 +8,9 @@ var HTTPS_SERVER_OPTIONS = {
   cert:   __dirname+'/server.cert'
 };
 
-var https = require('https');
-var httpsAgent = new https.Agent({rejectUnauthorized: false});
+var AGENT_OPTIONS = {
+  https_ignore_errors: true
+};
 
 describe('no-frills-http', function() {
 
@@ -30,7 +31,7 @@ describe('no-frills-http', function() {
       });
 
       //perform the request
-      request.get(srv.url, {agent: secure ? httpsAgent : null}, function(err, res) {
+      request.get(srv.url, {agent: AGENT_OPTIONS}, function(err, res) {
 
         //assert no error occurred
         assert(!err, err);
@@ -95,7 +96,7 @@ describe('no-frills-http', function() {
       });
 
       //perform the request
-      request.post(srv.url, {agent: secure ? httpsAgent : null}, function(err, res) {
+      request.post(srv.url, {agent: AGENT_OPTIONS}, function(err, res) {
 
         //assert no error occurred
         assert(!err, err);

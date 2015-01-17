@@ -1,6 +1,6 @@
 {
   "name": "no-frills-request",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "license": "MIT",
   "keywords": [
     "http",
@@ -18,7 +18,6 @@
     "url": "https://github.com/digitaledgeit/js-no-frills-request/issues"
   },
   "devDependencies": {
-    "express": "^4.10.2",
     "simple-server-setup": "0.0.1"
   }
 }
