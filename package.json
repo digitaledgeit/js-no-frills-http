@@ -1,6 +1,6 @@
 {
   "name": "no-frills-request",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "MIT",
   "keywords": ["http", "request", "fetch", "get", "post"],
   "description": "A super low-level, light-weight wrapper for sending and receiving HTTP requests.",

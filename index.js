@@ -49,7 +49,6 @@ function request(method, url, options, callback) {
   });
 
   req.on('error', function(err) {
-    console.log('Error received');
     callback(err);
   });
 

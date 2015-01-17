@@ -9,37 +9,46 @@ This module abstracts the http/https modules and not a whole lot more.
 	$ npm install --save no-frills-request
 	
 ## Example
+
+### Concatenate a text URL to string
 	
-### Download a binary file
+	var request = require('no-frills-request');
+	
+	request.get('https://www.google.com.au/', function(err, res) {
+	  if (err) return console.log(err);
+	
+	  var body = '';
+	
+	  res.on('data', function(data) {
+		body += data.toString();
+	  });
+      	
+	  res.on('end', function() {
+		console.log(body);
+	  });
+      
+	});
+		
+### Download a binary URL to file
 	
 	var fs = require('fs');
 	var path = require('path');
-	var request = require('request-on-steroids');
+	var request = require('no-frills-request');
 	
 	request.get('http://www.google.com/images/srpr/logo11w.png', function(err, res) {
 	  if (err) return console.log(err);
 	
-	  if (res.headers['content-type'].split(';')[0] === 'text/html') {
-	  
-		  res.on('data', function() {
-			console.log(res.url+' saved to '+fname);
-		  });
-	  
-	  } else {
-	  
-	  	  var
-      	    fname    = './'+path.basename(res.url.path),
-      	    fstream  = fs.createWriteStream(fname)
-      	  ;
-      	
-      	  fstream.on('close', function() {
-      	    console.log(res.url+' saved to '+fname);
-      	  });
-      	
-      	  res.pipe(fstream);
-      	
-	  }
-
+	  var
+		fname    = './'+path.basename(res.url.path),
+		fstream  = fs.createWriteStream(fname)
+	  ;
+	
+	  fstream.on('end', function() {
+		console.log(res.url.href+' saved to '+fname);
+	  });
+	
+	  res.pipe(fstream);
+	
 	});
 	
 ## License
