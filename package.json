@@ -2,16 +2,23 @@
   "name": "no-frills-request",
   "version": "0.1.4",
   "license": "MIT",
-  "keywords": ["http", "request", "fetch", "get", "post"],
+  "keywords": [
+    "http",
+    "request",
+    "fetch",
+    "get",
+    "post"
+  ],
   "description": "A super low-level, light-weight wrapper for sending and receiving HTTP requests.",
   "repository": {
     "type": "git",
-    "url":  "https://github.com/digitaledgeit/js-no-frills-request"
+    "url": "https://github.com/digitaledgeit/js-no-frills-request"
   },
   "bugs": {
     "url": "https://github.com/digitaledgeit/js-no-frills-request/issues"
   },
   "devDependencies": {
-    "express": "^4.10.2"
+    "express": "^4.10.2",
+    "simple-server-setup": "0.0.1"
   }
 }

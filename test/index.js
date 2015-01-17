@@ -1,8 +1,13 @@
 var assert = require('assert');
-var server = require('./server');
+var server = require('simple-server-setup');
 var request = require('..');
 
-var fs = require('fs');
+var HTTPS_SERVER_OPTIONS = {
+  secure: true,
+  key:    __dirname+'/server.key',
+  cert:   __dirname+'/server.cert'
+};
+
 var https = require('https');
 var httpsAgent = new https.Agent({rejectUnauthorized: false});
 
@@ -16,15 +21,16 @@ describe('no-frills-http', function() {
       var content = '{ "Message": "Hello World!" }';
 
       //create the server
-      var app = server(function(req, res, next) {
-        res.statusCode = status;
-        res.set('Content-Type', header);
-        res.send(content);
-        next();
-      }, {secure: secure});
+      var srv = server.create(secure ? HTTPS_SERVER_OPTIONS : {}, function(app) {
+        app.get('/', function(req, res) {
+          res.statusCode = status;
+          res.set('Content-Type', header);
+          res.send(content);
+        });
+      });
 
       //perform the request
-      request.get('http://localhost:3000/', {agent: secure ? httpsAgent : null}, function(err, res) {
+      request.get(srv.url, {agent: secure ? httpsAgent : null}, function(err, res) {
 
         //assert no error occurred
         assert(!err, err);
@@ -54,8 +60,7 @@ describe('no-frills-http', function() {
             content
           );
 
-          app.close();
-          done();
+          srv.close(done);
 
         });
 
@@ -81,15 +86,16 @@ describe('no-frills-http', function() {
       var content = '{ "Message": "Hello World!" }';
 
       //create the server
-      var app = server(function(req, res, next) {
-        res.statusCode = status;
-        res.set('Content-Type', header);
-        res.send(content);
-        next();
-      }, {secure: secure, method: 'post'});
+      var srv = server.create(secure ? HTTPS_SERVER_OPTIONS : {}, function(app) {
+        app.post('/', function(req, res) {
+          res.statusCode = status;
+          res.set('Content-Type', header);
+          res.send(content);
+        });
+      });
 
       //perform the request
-      request.post('http://localhost:3000/', {agent: secure ? httpsAgent : null}, function(err, res) {
+      request.post(srv.url, {agent: secure ? httpsAgent : null}, function(err, res) {
 
         //assert no error occurred
         assert(!err, err);
@@ -119,8 +125,7 @@ describe('no-frills-http', function() {
             content
           );
 
-          app.close();
-          done();
+          srv.close(done);
 
         });
 

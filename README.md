@@ -2,7 +2,7 @@
 
 A super low-level, light-weight wrapper for sending and receiving HTTP requests. 
 
-This module abstracts the http/https modules and not a whole lot more.
+This module abstracts the HTTP/HTTPS modules and not a whole lot more.
 
 ## Installation
 
