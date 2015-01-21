@@ -1,6 +1,7 @@
 var URL       = require('url');
 var HTTP      = require('http');
 var HTTPS     = require('https');
+var Stream    = require('stream');
 
 /**
  * Maps the user friendly agent options to native nodejs agent options
@@ -111,14 +112,18 @@ function request(method, url, options, callback) {
 
   //write or pipe the body data
   if (options.body) {
-    if (typeof(options.body.pipe) === 'function') {
+    if (options.body instanceof Stream) { //should be Stream.Readable but not everyone implements it
       options.body.pipe(req);
+    } else if (options.body instanceof Buffer) {
+      req.write(options.body);
+      req.end();
     } else {
       req.write(String(options.body));
+      req.end();
     }
+  } else {
+    req.end();
   }
-
-  req.end();
 
 };
 

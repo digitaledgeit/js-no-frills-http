@@ -1,6 +1,8 @@
 var assert = require('assert');
 var server = require('simple-server-setup');
 var request = require('..');
+var parser  = require('body-parser');
+var StringStream = require('string-stream');
 
 var HTTPS_SERVER_OPTIONS = {
   secure: true,
@@ -30,38 +32,42 @@ describe('no-frills-http', function() {
         });
       });
 
-      //perform the request
-      request.get(srv.url, {agent: AGENT_OPTIONS}, function(err, res) {
+      srv.on('configured', function() {
 
-        //assert no error occurred
-        assert(!err, err);
+        //perform the request
+        request.get(srv.url, {agent: AGENT_OPTIONS}, function (err, res) {
 
-        //assert we have the status code
-        assert.equal(
-          res.statusCode,
-          status
-        );
+          //assert no error occurred
+          assert(!err, err);
 
-        //assert we have got the header
-        assert.equal(
-          res.headers['content-type'],
-          header //note it gets cast to lowercase
-        );
-
-        var buffer = '';
-        res.on('data', function(data) {
-          buffer += data.toString();
-        });
-
-        res.on('end', function() {
-
-          //assert we have the content
+          //assert we have the status code
           assert.equal(
-            buffer,
-            content
+            res.statusCode,
+            status
           );
 
-          srv.close(done);
+          //assert we have got the header
+          assert.equal(
+            res.headers['content-type'],
+            header //note it gets cast to lowercase
+          );
+
+          var buffer = '';
+          res.on('data', function (data) {
+            buffer += data.toString();
+          });
+
+          res.on('end', function () {
+
+            //assert we have the content
+            assert.equal(
+              buffer,
+              content
+            );
+
+            srv.close(done);
+
+          });
 
         });
 
@@ -95,38 +101,42 @@ describe('no-frills-http', function() {
         });
       });
 
-      //perform the request
-      request.post(srv.url, {agent: AGENT_OPTIONS}, function(err, res) {
+      srv.on('configured', function() {
 
-        //assert no error occurred
-        assert(!err, err);
+        //perform the request
+        request.post(srv.url, {body: content, agent: AGENT_OPTIONS}, function(err, res) {
 
-        //assert we have the status code
-        assert.equal(
-          res.statusCode,
-          status
-        );
+          //assert no error occurred
+          assert(!err, err);
 
-        //assert we have got the header
-        assert.equal(
-          res.headers['content-type'],
-          header //note it gets cast to lowercase
-        );
-
-        var buffer = '';
-        res.on('data', function(data) {
-          buffer += data.toString();
-        });
-
-        res.on('end', function() {
-
-          //assert we have the content
+          //assert we have the status code
           assert.equal(
-            buffer,
-            content
+            res.statusCode,
+            status
           );
 
-          srv.close(done);
+          //assert we have got the header
+          assert.equal(
+            res.headers['content-type'],
+            header //note it gets cast to lowercase
+          );
+
+          var buffer = '';
+          res.on('data', function(data) {
+            buffer += data.toString();
+          });
+
+          res.on('end', function() {
+
+            //assert we have the content
+            assert.equal(
+              buffer,
+              content
+            );
+
+            srv.close(done);
+
+          });
 
         });
 
@@ -140,6 +150,75 @@ describe('no-frills-http', function() {
 
     it('should have status code, headers and body for https request', function(done) {
       post(true, done);
+    });
+
+    it('should send a string body', function(done) {
+
+      var srv = server.create(function(app) {
+        app.use(parser.text());
+        app.post('/', function(req, res) {
+          assert.equal(req.body, 'Hello World!');
+          res.end();
+          srv.close();
+        });
+      });
+
+      srv.on('configured', function() {
+
+        request.post(srv.url, {headers: {'Content-Type': 'text/plain'}, body: 'Hello World!'}, function(error, response) {
+          if (error) throw error;
+          response.resume();
+          response.on('end', done);
+        });
+
+      });
+
+    });
+
+    it('should send a buffer body', function(done) {
+
+      var srv = server.create(function(app) {
+        app.use(parser.text());
+        app.post('/', function(req, res) {
+          assert.equal(req.body, 'Hello World!');
+          res.end();
+          srv.close();
+        });
+      });
+
+      srv.on('configured', function() {
+
+        request.post(srv.url, {headers: {'Content-Type': 'text/plain'}, body: 'Hello World!'}, function(error, response) {
+          if (error) throw error;
+          response.resume();
+          response.on('end', done);
+        });
+
+      });
+
+    });
+
+    it('should send a stream body', function(done) {
+
+      var srv = server.create(function(app) {
+        app.use(parser.text());
+        app.post('/', function(req, res) {
+          assert.equal(req.body, 'Hello World!');
+          res.end();
+          srv.close();
+        });
+      });
+
+      srv.on('configured', function() {
+
+        request.post(srv.url, {headers: {'Content-Type': 'text/plain'}, body: 'Hello World!'}, function(error, response) {
+          if (error) throw error;
+          response.resume();
+          response.on('end', done);
+        });
+
+      });
+
     });
 
   });
