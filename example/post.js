@@ -1,7 +1,7 @@
 var request = require('..');
 
 request.post(
-  'http://localhost/contact/',
+  'http://httpbin.org/post',
   {
     headers: {
       'User-Agent':   'no-frills-request',

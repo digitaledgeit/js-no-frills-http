@@ -22,16 +22,17 @@ This module abstracts the HTTP/HTTPS modules and not a whole lot more.
 	  res.on('data', function(data) {
 		body += data.toString();
 	  });
-      	
+	
 	  res.on('end', function() {
 		console.log(body);
 	  });
-      
+	
 	});
 		
 ### Download a binary URL to file
 	
 	var fs = require('fs');
+	var url = require('url');
 	var path = require('path');
 	var request = require('no-frills-request');
 	
@@ -39,32 +40,36 @@ This module abstracts the HTTP/HTTPS modules and not a whole lot more.
 	  if (err) return console.log(err);
 	
 	  var
-		fname    = './'+path.basename(res.url.path),
+		fname    = './'+path.basename(url.parse(res.url).path),
 		fstream  = fs.createWriteStream(fname)
 	  ;
 	
-	  fstream.on('end', function() {
+	  fstream.on('close', function() {
 		console.log(res.url.href+' saved to '+fname);
 	  });
 	
 	  res.pipe(fstream);
 	
 	});
+
 	
 ## API
 
 ### request(method, url, [options], callback);
 
+Send a HTTP Request
+
 Options:
 
-	@param {String}          method
-	@param {String}          url
-	@param {Object}          [options]
-	@param {Object}          [options.headers]
-	@param {String|Stream}   [options.body]
-	@param {String}          [options.agent.https_protocol]
-	@param {Boolean}         [options.agent.https_ignore_errors]
-	@param {Function}        callback
+ * @param   {string}                method
+ * @param   {string}                url
+ * @param   {Object}                [options]
+ * @param   {Object}                [options.headers]
+ * @param   {string|Buffer|Stream}  [options.body]
+ * @param   {Object}                [options.agent]
+ * @param   {string}                [options.agent.https_protocol]
+ * @param   {boolean}               [options.agent.https_ignore_errors]
+ * @param   {function(Error, http.IncomingMessage)} callback
 
 ### request.get(url, [options], callback)
 
@@ -73,6 +78,8 @@ Options:
 ### request.put(url, [options], callback)
 
 ### request.delete(url, [options], callback)
+		
+### request.create(method, url, headers, options) : http.ClientRequest
 		
 ## License
 

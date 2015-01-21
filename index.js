@@ -5,9 +5,9 @@ var Stream    = require('stream');
 
 /**
  * Maps the user friendly agent options to native nodejs agent options
- * @param   {String} protocol
- * @param options
- * @returns {*}
+ * @param   {string} protocol
+ * @param   {Object} options
+ * @returns {Object}
  */
 function agent_options(protocol, options) {
   var nodeOptions;
@@ -50,26 +50,22 @@ function agent_options(protocol, options) {
 }
 
 /**
- * Perform a HTTP request
- * @param {String}          method
- * @param {String}          url
- * @param {Object}          [options]
- * @param {Object}          [options.headers]
- * @param {String|Stream}   [options.body]
- * @param {String}          [options.agent.https_protocol]
- * @param {Boolean}         [options.agent.https_ignore_errors]
- * @param {Function}        callback
+ * Create a HTTP Request
+ * @param   {string}                method
+ * @param   {string}                url
+ * @param   {Object}                [headers]
+ * @param   {Object}                [options]
+ * @param   {string}                [options.https_protocol]
+ * @param   {boolean}               [options.https_ignore_errors]
+ * @returns {http.ClientRequest}
  */
-function request(method, url, options, callback) {
-
-  if (typeof(callback) === 'undefined' && typeof(options) === 'function') {
-    callback  = options;
-    options   = {};
-  }
+function create(method, url, headers, options) {
+  headers = headers || {};
+  options = options || {};
 
   var client, agent;
   var parsedUrl     = URL.parse(url);
-  var agentOptions  = agent_options(parsedUrl.protocol, options.agent);
+  var agentOptions  = agent_options(parsedUrl.protocol, options);
 
   switch (parsedUrl.protocol) {
 
@@ -97,35 +93,78 @@ function request(method, url, options, callback) {
     port:     parsedUrl.port,
     path:     parsedUrl.path,
     auth:     parsedUrl.auth,
-    headers:  options.headers || {},
+    headers:  headers,
     agent:    agent
   });
 
-  req.on('response', function(res) {
-    res.url = parsedUrl;
-    callback(undefined, res);
-  });
+  /**
+   * Send the request
+   * @param   {string|Buffer|Stream=} body The request body
+   * @returns {http.ClientRequest}
+   */
+  req.send = function(body) {
 
+    //write the body to the stream
+    if (body) {
+      if (body instanceof Stream) { //should be Stream.Readable but not everyone implements it
+        body.pipe(this);
+      } else if (body instanceof Buffer) {
+        this.write(body);
+        this.end();
+      } else {
+        this.write(String(body));
+        this.end();
+      }
+    } else {
+      this.end();
+    }
+
+    return this;
+  };
+
+  return req;
+}
+
+/**
+ * Send a HTTP Request
+ * @param   {string}                method
+ * @param   {string}                url
+ * @param   {Object}                [options]
+ * @param   {Object}                [options.headers]
+ * @param   {string|Buffer|Stream}  [options.body]
+ * @param   {Object}                [options.agent]
+ * @param   {string}                [options.agent.https_protocol]
+ * @param   {boolean}               [options.agent.https_ignore_errors]
+ * @param   {function(Error, http.IncomingMessage)} callback
+ * @returns {http.ClientRequest}
+ */
+function request(method, url, options, callback) {
+
+  if (typeof(callback) === 'undefined' && typeof(options) === 'function') {
+    callback  = options;
+    options   = {};
+  }
+
+  //create the request
+  var req = create(method, url, options.headers, options.agent);
+
+  //listen for failure
   req.on('error', function(err) {
     callback(err);
   });
 
-  //write or pipe the body data
-  if (options.body) {
-    if (options.body instanceof Stream) { //should be Stream.Readable but not everyone implements it
-      options.body.pipe(req);
-    } else if (options.body instanceof Buffer) {
-      req.write(options.body);
-      req.end();
-    } else {
-      req.write(String(options.body));
-      req.end();
-    }
-  } else {
-    req.end();
-  }
+  //listen for success
+  req.on('response', function(res) {
+    res.url = url;
+    callback(undefined, res);
+  });
+
+  //send the request
+  req.send(options.body);
 
 };
+
+request.create = create;
 
 request.get = function(url, options, callback) {
   return request('GET', url, options, callback);
