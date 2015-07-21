@@ -84,7 +84,7 @@ function create(method, url, headers, options) {
       break;
 
     default:
-      throw new Error('Unsupported protocol: '+parsedUrl.protocol);
+      throw new Error('Unsupported protocol: '+parsedUrl.protocol+' in URL '+url);
   }
 
   var req = client.request({
